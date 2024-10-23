@@ -101,7 +101,7 @@ class Trainer(object):
         device = torch.device("cuda:" + str(self.gpu_id) if torch.cuda.is_available() else "cpu")
         checkpoint_dict = torch.load(checkpoint_path, map_location=device)
 
-        self.net.load_state_dict(checkpoint_dict['net'])
+        self.net.load_state_dict(checkpoint_dict['net'], strict=False)
 
         # assert net_type == checkpoint_dict['net_type'], 'Network is not of correct type.'
         if isinstance(checkpoint, int) or (checkpoint is None):

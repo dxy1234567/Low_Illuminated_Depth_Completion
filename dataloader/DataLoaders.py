@@ -73,8 +73,8 @@ def KittiDataLoader(params):
     dataset_sizes['val'] = {len(image_datasets['val'])}
 
     ###### Selected Validation set ######
-    selval_data_path = os.path.join(ds_dir, 'depth_selection/val_selection_cropped/velodyne_raw')
-    selval_gt_path = os.path.join(ds_dir, 'depth_selection/val_selection_cropped/groundtruth_depth')
+    selval_data_path = os.path.join(ds_dir, 'data_depth_selection/depth_selection/val_selection_cropped/velodyne_raw')
+    selval_gt_path = os.path.join(ds_dir, 'data_depth_selection/depth_selection/val_selection_cropped/groundtruth_depth')
 
     image_datasets['selval'] = eval(dataset)(selval_data_path, selval_gt_path, setname='selval', transform=None,
                                                  norm_factor=norm_factor, invert_depth=invert_depth,
@@ -85,8 +85,8 @@ def KittiDataLoader(params):
     dataset_sizes['selval'] = {len(image_datasets['selval'])}
 
     ###### Selected test set ######
-    test_data_path = os.path.join(ds_dir, 'depth_selection/test_depth_completion_anonymous/velodyne_raw')
-    test_gt_path = os.path.join(ds_dir, 'depth_selection/test_depth_completion_anonymous/velodyne_raw')
+    test_data_path = os.path.join(ds_dir, 'data_depth_selection/depth_selection/test_depth_completion_anonymous/velodyne_raw')
+    test_gt_path = os.path.join(ds_dir, 'data_depth_selection/depth_selection/test_depth_completion_anonymous/velodyne_raw')
 
     image_datasets['test'] = eval(dataset)(test_data_path, test_gt_path, setname='test', transform=None,
                                                norm_factor=norm_factor, invert_depth=invert_depth,

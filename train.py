@@ -30,6 +30,7 @@ from modules.losses import *
 # Fix CUDNN error for non-contiguous inputs
 import torch.backends.cudnn as cudnn
 
+print(torch.cuda.current_device())
 cudnn.enabled = True
 cudnn.benchmark = True
 
@@ -53,7 +54,7 @@ parser.add_argument('-set', action='store', dest='set', default='selval', type=s
 args = parser.parse_args()
 
 # Path to the workspace directory
-training_ws_path = 'workspace/'
+training_ws_path = '_20_optimal/workspace'
 exp = args.exp
 exp_dir = os.path.join(training_ws_path, exp)
 
@@ -105,6 +106,7 @@ optimizer = getattr(optim, params['optimizer'])(parameters, lr=params['lr'],
 # lr_decay = lr_scheduler.MultiStepLR(optimizer, milestones=params['lr_decay_step'], gamma=params['lr_decay']) #
 lr_decay = lr_scheduler.StepLR(optimizer, step_size=params['lr_decay_step'], gamma=params['lr_decay'])
 
+print(torch.cuda.is_available())
 mytrainer = t.KittiDepthTrainer(model, params, optimizer, objective, lr_decay, dataloaders, dataset_sizes,
                                     workspace_dir=exp_dir, sets=sets, use_load_checkpoint=args.chkpt)
 

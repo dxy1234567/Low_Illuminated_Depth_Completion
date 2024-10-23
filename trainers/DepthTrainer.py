@@ -80,18 +80,26 @@ class KittiDepthTrainer(Trainer):
         print('Start the %d th epoch at ' % self.epoch)
         print(time.strftime('%m.%d.%H:%M:%S', time.localtime(time.time())))
 
+        # 记录损失值
+        losses = []
+
         for epoch in range(self.epoch, max_epochs + 1):  # range function returns max_epochs-1
             start_epoch_time = time.time()
 
             self.epoch = epoch
 
             # Decay Learning Rate
-            self.lr_scheduler.step()  # LR decay
+           
 
             print('\nTraining Epoch {}: (lr={}) '.format(epoch, self.optimizer.param_groups[0]['lr']))  # , end=' '
 
             # Train the epoch
+            # 得到当前轮次的损失值
             loss_meter = self.train_epoch()
+            self.lr_scheduler.step()  # LR decay
+
+            # 保存损失值
+            losses.append(loss_meter)
 
             # Add the average loss for this epoch to stats
             for s in self.sets: self.stats[s + '_loss'].append(loss_meter[s].avg)
@@ -117,8 +125,44 @@ class KittiDepthTrainer(Trainer):
         print("Training [%s] Finished using %.2f HRs." % (self.exp_name, self.training_time / 3600))
 
         return self.net
+    
+    def calculate_eval(self):
+        device = torch.device("cuda:" + str(self.params['gpu_id']) if torch.cuda.is_available() else "cpu")
+
+        loss_val = AverageMeter()
+
+        with torch.no_grad():
+            for data in self.dataloaders["selval"]:
+
+                    torch.cuda.synchronize()
+
+                    inputs_d, C, labels, item_idxs, inputs_rgb = data
+                    inputs_d = inputs_d.to(device)
+                    C = C.to(device)
+                    labels = labels.to(device)
+                    inputs_rgb = inputs_rgb.to(device)
+
+                    outputs = self.net(inputs_d, inputs_rgb)
+
+
+                    if len(outputs) > 1:
+                        outputs = outputs[0]
+
+                    torch.cuda.synchronize()
+
+                    # Calculate loss for valid pixel in the ground truth
+                    loss = self.objective(outputs, labels, self.epoch)
+
+                    # statistics
+                    loss_val.update(loss.item(), inputs_d.size(0))
+
+                    torch.cuda.empty_cache()
+        return loss_val
 
     def train_epoch(self):
+        """
+            训练一轮并返回该轮训练的损失值
+        """
         device = torch.device("cuda:" + str(self.params['gpu_id']) if torch.cuda.is_available() else "cpu")
 
         loss_meter = {}
@@ -139,11 +183,12 @@ class KittiDepthTrainer(Trainer):
                 loss11 = self.objective(outputs[0], labels)
                 loss12 = self.objective(outputs[1], labels)
                 loss14 = self.objective(outputs[2], labels)
+                loss18 = self.objective(outputs[3], labels)
 
                 if self.epoch < 6:
-                    loss = loss14 + loss12 + loss11
+                    loss = loss18 + loss14 + loss12 + loss11
                 elif self.epoch < 11:
-                    loss = 0.1 * loss14 + 0.1 * loss12 + loss11
+                    loss = 0.1 * loss18 + 0.1 * loss14 + 0.1 * loss12 + loss11
                 else:
                     loss = loss11
 
@@ -164,6 +209,9 @@ class KittiDepthTrainer(Trainer):
                     print('Loss within the curt iter: {:.8f}\n'.format(loss_meter[s].avg))
 
             print('[{}] Loss: {:.8f}'.format(s, loss_meter[s].avg))
+            #
+            loss_val = self.calculate_eval()
+            print('[{}] Loss: {:.8f}'.format("selval", loss_val.avg))
             torch.cuda.empty_cache()
 
         return loss_meter
@@ -197,6 +245,7 @@ class KittiDepthTrainer(Trainer):
                     print('Evaluating using initial parameters')
 
         self.net.train(False)
+        self.net.eval()
 
         # AverageMeters for Loss
         loss_meter = {}
