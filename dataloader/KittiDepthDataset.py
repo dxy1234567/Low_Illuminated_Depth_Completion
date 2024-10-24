@@ -23,17 +23,18 @@ from torch.utils.data import DataLoader, Dataset
 
 class KittiDepthDataset(Dataset):
     def __init__(self, data_path, gt_path, setname='train', transform=None,
-                 rgb_dir=None, flip = False, blind = False):
+                 gray_dir=None, flip = False, blind = False):
         self.data_path = data_path
         self.gt_path = gt_path
+        self.gray_dir = gray_dir
         self.setname = setname
         self.transform = transform
-        self.rgb_dir = rgb_dir
         self.flip = flip
         self.blind = blind
 
         self.data = list(sorted(glob.iglob(self.data_path + "/**/*.png", recursive=True)))
         self.gt = list(sorted(glob.iglob(self.gt_path + "/**/*.png", recursive=True)))
+        self.gray = list(sorted(glob.iglob(self.gt_path + "/**/*.png", recursive=True)))
 
         assert (len(self.gt) == len(self.data))
 
@@ -63,9 +64,7 @@ class KittiDepthDataset(Dataset):
 
         # Read images and convert them to 4D floats
         data = Image.open(str(self.data[item]))
-
         gt = Image.open(str(self.gt[item]))
-
 
 
         # Read RGB images
@@ -126,8 +125,6 @@ class KittiDepthDataset(Dataset):
             blind_start = random.randint(100, H - 50)
             data[blind_start:blind_start+50, :] = 0
 
-        # define the certainty
-        C = (data > 0).astype(float)
 
 
         # Normalize the data
@@ -137,12 +134,9 @@ class KittiDepthDataset(Dataset):
         # Expand dims into Pytorch format
         data = np.expand_dims(data, 0)
         gt = np.expand_dims(gt, 0)
-        C = np.expand_dims(C, 0)
-
         # Convert to Pytorch Tensors
         data = torch.tensor(data, dtype=torch.float)
         gt = torch.tensor(gt, dtype=torch.float)
-        C = torch.tensor(C, dtype=torch.float)
 
         # Convert depth to disparity
         if self.invert_depth:

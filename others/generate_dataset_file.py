@@ -2,18 +2,19 @@ import os
 import random
 import shutil
 
-def select_random_frames(source_dir, dest_dir, num_frames=100):
+def select_random_frames(source_dir, dst_dir, num_frames=100):
     """
     从每个序列文件夹中随机抽取 num_frames 帧图像，作为测试集保存到目标目录。
     :param source_dir: 源数据集的根目录（每个子文件夹对应一个序列）
-    :param dest_dir: 保存测试集的目标目录
+    :param dst_dir: 保存测试集的目标目录
     :param num_frames: 从每个序列中随机抽取的帧数
     """
     # 确保目标目录存在
-    os.makedirs(dest_dir, exist_ok=True)
+    os.makedirs(dst_dir, exist_ok=True)
 
     # 遍历每个序列（子文件夹）
     for sequence_folder in os.listdir(source_dir):
+        if sequence_folder
         sequence_path = os.path.join(source_dir, sequence_folder)
 
         # 检查是否是文件夹
@@ -30,7 +31,7 @@ def select_random_frames(source_dir, dest_dir, num_frames=100):
             selected_frames = random.sample(frame_files, num_frames)
 
             # 创建对应的测试集目录
-            test_sequence_path = os.path.join(dest_dir, sequence_folder)
+            test_sequence_path = os.path.join(dst_dir, sequence_folder)
             os.makedirs(test_sequence_path, exist_ok=True)
 
             # 将选中的帧复制到目标目录
@@ -43,5 +44,5 @@ def select_random_frames(source_dir, dest_dir, num_frames=100):
 
 # 示例用法
 source_dir = 'path/to/source/dataset'  # 源数据集目录
-dest_dir = 'path/to/test/dataset'      # 测试集保存目录
-select_random_frames(source_dir, dest_dir, num_frames=100)
+dst_dir = 'path/to/test/dataset'      # 测试集保存目录
+select_random_frames(source_dir, dst_dir, num_frames=100)
