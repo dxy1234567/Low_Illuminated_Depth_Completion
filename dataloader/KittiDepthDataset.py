@@ -1,3 +1,4 @@
+
 """
 This script is modified from the work of Abdelrahman Eldesokey.
 Find more details from https://github.com/abdo-eldesokey/nconv
@@ -21,17 +22,13 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class KittiDepthDataset(Dataset):
-    def __init__(self, data_path, gt_path, setname='train', transform=None, norm_factor=256, invert_depth=False,
-                 rgb_dir=None, rgb2gray=False, fill_depth = False, flip = False, blind = False):
+    def __init__(self, data_path, gt_path, setname='train', transform=None,
+                 rgb_dir=None, flip = False, blind = False):
         self.data_path = data_path
         self.gt_path = gt_path
         self.setname = setname
         self.transform = transform
-        self.norm_factor = norm_factor
-        self.invert_depth = invert_depth
         self.rgb_dir = rgb_dir
-        self.rgb2gray = rgb2gray
-        self.fill_depth = fill_depth
         self.flip = flip
         self.blind = blind
 
@@ -59,17 +56,10 @@ class KittiDepthDataset(Dataset):
 
             assert (data_path == gt_path)  # Check filename
 
-            # Set the certainty path
-            sep = str(self.data[item]).split('data_depth_velodyne')
-
         elif self.setname == 'selval':
             data_path = self.data[item].split('00000')[1]
             gt_path = self.gt[item].split('00000')[1]
             assert (data_path == gt_path)
-            # Set the certainty path
-            sep = str(self.data[item]).split('/velodyne_raw/')
-
-
 
         # Read images and convert them to 4D floats
         data = Image.open(str(self.data[item]))
@@ -104,19 +94,7 @@ class KittiDepthDataset(Dataset):
             rgb_path = data_path[:idx] + 'image/' + fname
             rgb = Image.open(rgb_path)
 
-
-
-
-
-        if self.rgb2gray:
-            t = torchvision.transforms.Grayscale(1)
-            rgb = t(rgb)
-
         W, H = data.size
-
-
-
-
 
         # Apply transformations if given
         if self.transform is not None:
@@ -131,6 +109,7 @@ class KittiDepthDataset(Dataset):
             rgb = rgb.crop((crop_lt_u, crop_lt_v, crop_lt_u + 1216, crop_lt_v + 352))
 
 
+        # 数据增强，数据翻转
         if self.flip and random.randint(0, 1) and self.setname == 'train':
             data = data.transpose(Image.FLIP_LEFT_RIGHT)
             gt = gt.transpose(Image.FLIP_LEFT_RIGHT)
@@ -152,8 +131,8 @@ class KittiDepthDataset(Dataset):
 
 
         # Normalize the data
-        data = data / self.norm_factor  # [0,1]
-        gt = gt / self.norm_factor
+        data = data / 256  # [0,1]
+        gt = gt / 256
 
         # Expand dims into Pytorch format
         data = np.expand_dims(data, 0)
@@ -178,10 +157,8 @@ class KittiDepthDataset(Dataset):
         # Convert RGB image to tensor
         rgb = np.array(rgb, dtype=np.float16)
         rgb /= 255
-        if self.rgb2gray:
-            rgb = np.expand_dims(rgb, 0)
-        else:
-            rgb = np.transpose(rgb, (2, 0, 1))
+        
+        rgb = np.transpose(rgb, (2, 0, 1))
         rgb = torch.tensor(rgb, dtype=torch.float)
 
-        return data, C, gt, item, rgb
+        return data, gt, item, rgb
