@@ -18,8 +18,9 @@ import importlib
 import json
 import argparse
 import numpy as np
-
 import torch
+
+
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim import lr_scheduler
@@ -30,9 +31,12 @@ from modules.losses import *
 # Fix CUDNN error for non-contiguous inputs
 import torch.backends.cudnn as cudnn
 
-print(torch.cuda.current_device())
+
 cudnn.enabled = True
 cudnn.benchmark = True
+
+print(torch.cuda.is_available())
+print(torch.cuda.current_device())
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -51,10 +55,12 @@ parser.add_argument('-chkpt', action='store', dest='chkpt', default=None,  nargs
 
 parser.add_argument('-set', action='store', dest='set', default='selval', type=str, nargs='?',
                     help='Which set to evaluate on "val", "selval" or "test"')
+# parser.add_argument('-dir', action='store', dest='dir', default='/data/KITTI_to_DC/dataset/', type=str,
+#                     nargs='?', help='Directory to dataset')
 args = parser.parse_args()
 
 # Path to the workspace directory
-training_ws_path = '_20_optimal/workspace'
+training_ws_path = 'workspace/'
 exp = args.exp
 exp_dir = os.path.join(training_ws_path, exp)
 
@@ -70,7 +76,7 @@ params['gpu_id'] = "0"
 device = torch.device("cuda:" + params['gpu_id'] if torch.cuda.is_available() else "cpu")
 
 # Dataloader
-dataloaders, dataset_sizes = KittiDataLoader(params)
+dataloaders = KittiDataLoader(params)
 
 # Import the network file
 f = importlib.import_module('network_' + exp)
@@ -104,7 +110,7 @@ optimizer = getattr(optim, params['optimizer'])(parameters, lr=params['lr'],
 lr_decay = lr_scheduler.StepLR(optimizer, step_size=params['lr_decay_step'], gamma=params['lr_decay'])
 
 print(torch.cuda.is_available())
-mytrainer = t.KittiDepthTrainer(model, params, optimizer, objective, lr_decay, dataloaders, dataset_sizes,
+mytrainer = t.KittiDepthTrainer(model, params, optimizer, objective, lr_decay, dataloaders,
                                     workspace_dir=exp_dir, sets=sets, use_load_checkpoint=args.chkpt)
 
 if mode == 'train':

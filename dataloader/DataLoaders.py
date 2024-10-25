@@ -26,8 +26,9 @@ def KittiDataLoader(params):
 
     image_datasets = {}
     dataloaders = {}
+    datasizes = {}
 
-    data_path = ''
+    data_path = params['dir_ds']
 
     ###### Training Set ######
     image_datasets['train'] = KittiDepthDataset(data_path, setname='train', transform=None, flip=False)
@@ -39,18 +40,20 @@ def KittiDataLoader(params):
 
     dataloaders['train'] = DataLoader(image_datasets['train'], shuffle=True, batch_size=params['train_batch_sz'],
                                       num_workers=num_worker)
-
+    datasizes['train'] = {len(image_datasets['train'])}
     ###### Test Set ######
     image_datasets['test'] = KittiDepthDataset(data_path, setname='test', transform=None, flip=False)
 
     dataloaders['test'] = DataLoader(image_datasets['test'], shuffle=True, batch_size=params['train_batch_sz'],
                                       num_workers=num_worker)
+    datasizes['test'] = {len(image_datasets['test'])}
 
     ###### Validation Set ######
     image_datasets['val'] = KittiDepthDataset(data_path, setname='val', transform=None, flip=False)
     
     dataloaders['val'] = DataLoader(image_datasets['val'], shuffle=False, batch_size=params['val_batch_sz'],
                                     num_workers=num_worker)
+    datasizes['val'] = {len(image_datasets['val'])}
 
     return dataloaders
 

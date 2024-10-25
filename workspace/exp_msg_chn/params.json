@@ -14,7 +14,7 @@
     "weight_decay": 0.0002,
     "lr_decay": 0.7,
     "lr_decay_step": 5,
-    "num_epochs": 50,
+    "num_epochs": 10,
     "save_chkpt_each": 1,
     "save_out_imgs": false,
     "print_time_each_iter": false,
@@ -28,5 +28,6 @@
     "trainer": "DepthTrainer",
     "dataset": "KittiDepthDataset",
     "data_loader": "KittiDataLoader",
-    "exp_name": "exp_msg_chn"
+    "exp_name": "exp_msg_chn",
+    "dir_ds": "/data/KITTI_to_DC/dataset/"
 }

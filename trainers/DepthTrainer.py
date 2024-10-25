@@ -26,7 +26,7 @@ err_metrics = ['MAE()', 'RMSE()','iMAE()', 'iRMSE()']
 
 
 class KittiDepthTrainer(Trainer):
-    def __init__(self, net, params, optimizer, objective, lr_scheduler, dataloaders, dataset_sizes,
+    def __init__(self, net, params, optimizer, objective, lr_scheduler, dataloaders,
                  workspace_dir, sets=['train', 'val'], use_load_checkpoint=None, K= None):
 
         # Call the constructor of the parent class (trainer)
@@ -35,7 +35,6 @@ class KittiDepthTrainer(Trainer):
 
         self.lr_scheduler = lr_scheduler
         self.dataloaders = dataloaders
-        self.dataset_sizes = dataset_sizes
         self.use_load_checkpoint = use_load_checkpoint
 
         self.params = params
@@ -172,13 +171,13 @@ class KittiDepthTrainer(Trainer):
             # Iterate over data.
             for data in self.dataloaders[s]:
                 start_iter_time = time.time()
-                inputs_d, C, labels, item_idxs, inputs_rgb = data
-                inputs_d = inputs_d.to(device)
+                inputs_d, labels, item_idxs, inputs_gray, C = data
                 C = C.to(device)
+                inputs_d = inputs_d.to(device)
                 labels = labels.to(device)
-                inputs_rgb = inputs_rgb.to(device)
+                inputs_gray = inputs_gray.to(device)
 
-                outputs = self.net(inputs_d, inputs_rgb)
+                outputs = self.net(inputs_d, inputs_gray)
                 # Calculate loss for valid pixel in the ground truth
                 loss11 = self.objective(outputs[0], labels)
                 loss12 = self.objective(outputs[1], labels)
