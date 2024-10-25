@@ -35,7 +35,7 @@ cudnn.enabled = True
 cudnn.benchmark = True
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 #torch.manual_seed(1)
 torch.cuda.manual_seed(1)
@@ -67,12 +67,10 @@ with open(os.path.join(exp_dir, 'params.json'), 'r') as fp:
 params['gpu_id'] = "0"
 
 # Use GPU or not
-#device = torch.device("cuda:" + str(params['gpu_id']) if torch.cuda.is_available() else "cpu")
 device = torch.device("cuda:" + params['gpu_id'] if torch.cuda.is_available() else "cpu")
 
 # Dataloader
-data_loader = params['data_loader'] if 'data_loader' in params else 'KittiDataLoader'
-dataloaders, dataset_sizes = eval(data_loader)(params)
+dataloaders, dataset_sizes = KittiDataLoader(params)
 
 # Import the network file
 f = importlib.import_module('network_' + exp)
@@ -91,7 +89,6 @@ elif args.mode == 'eval':
     mode = 'eval'  # train    eval
     sets = [args.set]  # train  selval
 
-kk=0
 # Objective function
 objective = locals()[params['loss']]()
 
