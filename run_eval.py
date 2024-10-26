@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('-exp', action='store', dest='exp', default='exp_msg_chn',
                         help='Experiment name as in workspace directory')
     #parser.add_argument('-chkpt', action='store', dest='chkpt', default=50,  nargs='?',   # None or number
-    parser.add_argument('-chkpt', action='store', dest='chkpt', default="_20_optimal/workspace/exp_msg_chn/checkpoints/DataParallel_ep0050.pth.tar",
+    parser.add_argument('-chkpt', action='store', dest='chkpt', default="workspace/exp_msg_chn/checkpoints/DataParallel_ep0020.pth.tar",
                         help='Checkpoint number to load')
 
     parser.add_argument('-set', action='store', dest='set', default='test', type=str, nargs='?',
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
 
     # Path to the workspace directory
-    training_ws_path = '_20_optimal/workspace'
+    training_ws_path = 'workspace'
     exp = args.exp
     exp_dir = os.path.join(training_ws_path, exp)
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     # Dataloader
     data_loader = params['data_loader'] if 'data_loader' in params else 'KittiDataLoader'
-    dataloaders, dataset_sizes = eval(data_loader)(params)
+    dataloaders = eval(data_loader)(params)
 
     # Import the network file
     f = importlib.import_module('network_' + exp)
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     # lr_decay = lr_scheduler.MultiStepLR(optimizer, milestones=params['lr_decay_step'], gamma=params['lr_decay']) #
     lr_decay = lr_scheduler.StepLR(optimizer, step_size=params['lr_decay_step'], gamma=params['lr_decay'])
 
-    mytrainer = t.KittiDepthTrainer(model, params, optimizer, objective, lr_decay, dataloaders, dataset_sizes,
+    mytrainer = t.KittiDepthTrainer(model, params, optimizer, objective, lr_decay, dataloaders,
                                         workspace_dir=exp_dir, sets=sets, use_load_checkpoint=args.chkpt)
 
     if mode == 'train':

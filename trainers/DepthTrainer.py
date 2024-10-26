@@ -114,14 +114,27 @@ class KittiDepthTrainer(Trainer):
             epoch_duration = end_epoch_time - start_epoch_time
             self.training_time += epoch_duration
             if self.params['print_time_each_epoch']:
-                print(
-                    'Have trained %.2f HRs, and %.2f HRs per epoch, [%s]\n' % (
+                print('Have trained %.2f HRs, and %.2f HRs per epoch, [%s]\n' % (
                     self.training_time / 3600, epoch_duration / 3600, self.exp_name))
 
         # Save the final model
         torch.save(self.net, self.workspace_dir + '/final_model.pth')
 
         print("Training [%s] Finished using %.2f HRs." % (self.exp_name, self.training_time / 3600))
+
+        plt.plot(losses, label='Training Loss')
+
+        # 设置标题和标签
+        plt.title('Training Loss Over Epochs')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss Value')
+
+        # 显示图例
+        plt.legend()
+
+        # 显示图形
+        plt.grid(True)  # 添加网格以便观察
+        plt.show()
 
         return self.net
     
@@ -131,17 +144,17 @@ class KittiDepthTrainer(Trainer):
         loss_val = AverageMeter()
 
         with torch.no_grad():
-            for data in self.dataloaders["selval"]:
+            for data in self.dataloaders["val"]:
 
                     torch.cuda.synchronize()
 
-                    inputs_d, C, labels, item_idxs, inputs_rgb = data
+                    inputs_d, labels, item_idxs, inputs_gray, C = data
                     inputs_d = inputs_d.to(device)
                     C = C.to(device)
                     labels = labels.to(device)
-                    inputs_rgb = inputs_rgb.to(device)
+                    inputs_gray = inputs_gray.to(device)
 
-                    outputs = self.net(inputs_d, inputs_rgb)
+                    outputs = self.net(inputs_d, inputs_gray)
 
 
                     if len(outputs) > 1:
@@ -184,9 +197,9 @@ class KittiDepthTrainer(Trainer):
                 loss14 = self.objective(outputs[2], labels)
                 loss18 = self.objective(outputs[3], labels)
 
-                if self.epoch < 6:
+                if self.epoch < 4:
                     loss = loss18 + loss14 + loss12 + loss11
-                elif self.epoch < 11:
+                elif self.epoch < 4:
                     loss = 0.1 * loss18 + 0.1 * loss14 + 0.1 * loss12 + loss11
                 else:
                     loss = loss11
@@ -210,7 +223,7 @@ class KittiDepthTrainer(Trainer):
             print('[{}] Loss: {:.8f}'.format(s, loss_meter[s].avg))
             #
             loss_val = self.calculate_eval()
-            print('[{}] Loss: {:.8f}'.format("selval", loss_val.avg))
+            print('[{}] Loss: {:.8f}'.format("val", loss_val.avg))
             torch.cuda.empty_cache()
 
         return loss_meter
@@ -269,13 +282,13 @@ class KittiDepthTrainer(Trainer):
                     torch.cuda.synchronize()
                     start_time = time.time()
 
-                    inputs_d, C, labels, item_idxs, inputs_rgb = data
+                    inputs_d, labels, item_idxs, inputs_gray, C = data
                     inputs_d = inputs_d.to(device)
                     C = C.to(device)
                     labels = labels.to(device)
-                    inputs_rgb = inputs_rgb.to(device)
+                    inputs_gray = inputs_gray.to(device)
 
-                    outputs = self.net(inputs_d, inputs_rgb)
+                    outputs = self.net(inputs_d, inputs_gray)
 
 
                     if len(outputs) > 1:

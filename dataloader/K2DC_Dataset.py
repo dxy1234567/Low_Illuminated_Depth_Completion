@@ -17,6 +17,7 @@ import torch
 import numpy as np
 import glob
 import random
+import cv2
 from torch.utils.data import  Dataset
 
 
@@ -45,9 +46,9 @@ class KittiDepthDataset(Dataset):
             return None
 
         # Read images and convert them to 4D floats
-        depth = Image.open(str(self.depth[item]))
-        gt = Image.open(str(self.gt[item]))
-        gray = Image.open(str(self.gray[item]))
+        depth = Image.open(str(self.depth[item])).convert('L')
+        gt = Image.open(str(self.gt[item])).convert('L')
+        gray = Image.open(str(self.gray[item])).convert('L')
 
         # Apply transformations if given
         if self.transform is not None:
@@ -64,7 +65,7 @@ class KittiDepthDataset(Dataset):
         # Convert to numpy
         depth = np.array(depth, dtype=np.float16)
         gt = np.array(gt, dtype=np.float16)
-        gray = np.array(gt, dtype=np.float16)
+        gray = np.array(gray, dtype=np.float16)
         C = (depth > 0).astype(float)
 
         # Normalize the depth

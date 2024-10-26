@@ -1,10 +1,13 @@
-import glob
+import cv2
+import torch
+import numpy as np
 
 
-data_path = "/home/cjs/data/KITTI/data_odometry_gray/dataset/sequences/01/image_0"
+img = cv2.imread('/root/ChenJiasheng/_20_1_optimal_lr_shce/workspace/exp_msg_chn/test_output_epoch_1/0000000000.png')
+img_KDC = cv2.imread('/data/data_depth_annotated/train/2011_09_26_drive_0001_sync/proj_depth/groundtruth/image_02/0000000005.png')
 
-data1 = glob.iglob(data_path + "/*.png", recursive=True)
-data2 = sorted(data1)
-data = list(data2)
+max = np.max(img)
+max_KDC = np.max(img_KDC)
+print()
 
 print("End")

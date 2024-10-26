@@ -131,7 +131,7 @@ class RGBEncoder(nn.Module):
 
         padding = int((filter_size - 1) / 2)
 
-        self.rgb_conv = nn.Conv2d(3, 16, kernel_size=3, padding=1)
+        self.rgb_conv = nn.Conv2d(1, 16, kernel_size=3, padding=1)
 
 
 
@@ -209,6 +209,7 @@ class DepthDecoder(nn.Module):
     def __init__(self, layers, filter_size):
         super(DepthDecoder, self).__init__()
         padding = int((filter_size - 1) / 2)
+        
 
         self.dec2 = nn.Sequential(nn.ReLU(),
                                   nn.ConvTranspose2d(layers // 2, layers // 2, filter_size, stride=2, padding=padding,

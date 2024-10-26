@@ -29,9 +29,10 @@ def KittiDataLoader(params):
     datasizes = {}
 
     data_path = params['dir_ds']
+    crop = transforms.CenterCrop((352, 1216))
 
     ###### Training Set ######
-    image_datasets['train'] = KittiDepthDataset(data_path, setname='train', transform=None, flip=False)
+    image_datasets['train'] = KittiDepthDataset(data_path, setname='train', transform=crop, flip=False)
 
     # Select the desired number of images from the training set
     if params['train_on'] != 'full':
@@ -42,14 +43,14 @@ def KittiDataLoader(params):
                                       num_workers=num_worker)
     datasizes['train'] = {len(image_datasets['train'])}
     ###### Test Set ######
-    image_datasets['test'] = KittiDepthDataset(data_path, setname='test', transform=None, flip=False)
+    image_datasets['test'] = KittiDepthDataset(data_path, setname='test', transform=crop, flip=False)
 
     dataloaders['test'] = DataLoader(image_datasets['test'], shuffle=True, batch_size=params['train_batch_sz'],
                                       num_workers=num_worker)
     datasizes['test'] = {len(image_datasets['test'])}
 
     ###### Validation Set ######
-    image_datasets['val'] = KittiDepthDataset(data_path, setname='val', transform=None, flip=False)
+    image_datasets['val'] = KittiDepthDataset(data_path, setname='val', transform=crop, flip=False)
     
     dataloaders['val'] = DataLoader(image_datasets['val'], shuffle=False, batch_size=params['val_batch_sz'],
                                     num_workers=num_worker)

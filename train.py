@@ -53,7 +53,7 @@ parser.add_argument('-chkpt', action='store', dest='chkpt', default=None,  nargs
 #parser.add_argument('-chkpt', action='store', dest='chkpt', default="/PATH/TO/YOUR/CHECKPOINT_FILE.pth.tar",
                     help='Checkpoint number to load')
 
-parser.add_argument('-set', action='store', dest='set', default='selval', type=str, nargs='?',
+parser.add_argument('-set', action='store', dest='set', default='val', type=str, nargs='?',
                     help='Which set to evaluate on "val", "selval" or "test"')
 # parser.add_argument('-dir', action='store', dest='dir', default='/data/KITTI_to_DC/dataset/', type=str,
 #                     nargs='?', help='Directory to dataset')
