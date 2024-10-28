@@ -131,7 +131,8 @@ class RGBEncoder(nn.Module):
 
         padding = int((filter_size - 1) / 2)
 
-        self.rgb_conv = nn.Conv2d(1, 16, kernel_size=3, padding=1)
+        self.rgb_conv = nn.Conv2d(1, 3, kernel_size=3, padding=1)
+        self.rgb_conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1)
 
 
 
@@ -184,6 +185,7 @@ class RGBEncoder(nn.Module):
 
         # 通道数扩大到16
         rgb = self.rgb_conv(input)
+        rgb = self.rgb_conv1(rgb)
 
         x0 = self.init(rgb)
         if pre_x is not None:

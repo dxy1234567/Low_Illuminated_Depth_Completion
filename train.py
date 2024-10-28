@@ -74,7 +74,6 @@ params['gpu_id'] = "0"
 
 # Use GPU or not
 device = torch.device("cuda:" + params['gpu_id'] if torch.cuda.is_available() else "cpu")
-
 # Dataloader
 dataloaders = KittiDataLoader(params)
 

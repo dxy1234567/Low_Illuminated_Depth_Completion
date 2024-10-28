@@ -1,13 +1,19 @@
-import cv2
 import torch
-import numpy as np
+from workspace.exp_msg_chn.network_exp_msg_chn import network
+import sys
+sys.path.append('./workspace/exp_msg_chn')
+
+model = network()
+model = torch.nn.DataParallel(model)
+
+params = torch.load('workspace/exp_msg_chn/checkpoints/DataParallel_ep0020.pth.tar', map_location=torch.device('cpu'))
+for key, value in params.items():
+    print(f"{key}: {value.shape}")
 
 
-img = cv2.imread('/root/ChenJiasheng/_20_1_optimal_lr_shce/workspace/exp_msg_chn/test_output_epoch_1/0000000000.png')
-img_KDC = cv2.imread('/data/data_depth_annotated/train/2011_09_26_drive_0001_sync/proj_depth/groundtruth/image_02/0000000005.png')
 
-max = np.max(img)
-max_KDC = np.max(img_KDC)
-print()
+# model.load_state_dict(torch.load('/root/ChenJiasheng/Low_Illuminated_Depth_Completion/workspace/exp_msg_chn/final_model.pth', map_location=torch.device('cpu')))
 
-print("End")
+# # 查看参数
+# for name, param in model.named_parameters():
+#     print(f"{name}: {param.shape}")

@@ -22,6 +22,7 @@ from utils.ErrorMetrics import *
 import time
 from modules.losses import *
 import cv2
+from utils.util import plot_losses
 err_metrics = ['MAE()', 'RMSE()','iMAE()', 'iRMSE()']
 
 
@@ -121,20 +122,9 @@ class KittiDepthTrainer(Trainer):
         torch.save(self.net, self.workspace_dir + '/final_model.pth')
 
         print("Training [%s] Finished using %.2f HRs." % (self.exp_name, self.training_time / 3600))
-
-        plt.plot(losses, label='Training Loss')
-
-        # 设置标题和标签
-        plt.title('Training Loss Over Epochs')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss Value')
-
-        # 显示图例
-        plt.legend()
-
-        # 显示图形
-        plt.grid(True)  # 添加网格以便观察
-        plt.show()
+        
+        # 保存损失值折线图
+        plot_losses(losses, 'output/losses/losses.png')
 
         return self.net
     
@@ -182,43 +172,44 @@ class KittiDepthTrainer(Trainer):
 
         for s in self.sets:
             # Iterate over data.
-            for data in self.dataloaders[s]:
-                start_iter_time = time.time()
-                inputs_d, labels, item_idxs, inputs_gray, C = data
-                C = C.to(device)
-                inputs_d = inputs_d.to(device)
-                labels = labels.to(device)
-                inputs_gray = inputs_gray.to(device)
+            for i in range(7):
+                for data in self.dataloaders[s]:
+                    start_iter_time = time.time()
+                    inputs_d, labels, item_idxs, inputs_gray, C = data
+                    C = C.to(device)
+                    inputs_d = inputs_d.to(device)
+                    labels = labels.to(device)
+                    inputs_gray = inputs_gray.to(device)
 
-                outputs = self.net(inputs_d, inputs_gray)
-                # Calculate loss for valid pixel in the ground truth
-                loss11 = self.objective(outputs[0], labels)
-                loss12 = self.objective(outputs[1], labels)
-                loss14 = self.objective(outputs[2], labels)
-                loss18 = self.objective(outputs[3], labels)
+                    outputs = self.net(inputs_d, inputs_gray)
+                    # Calculate loss for valid pixel in the ground truth
+                    loss11 = self.objective(outputs[0], labels)
+                    loss12 = self.objective(outputs[1], labels)
+                    loss14 = self.objective(outputs[2], labels)
+                    loss18 = self.objective(outputs[3], labels)
 
-                if self.epoch < 4:
-                    loss = loss18 + loss14 + loss12 + loss11
-                elif self.epoch < 4:
-                    loss = 0.1 * loss18 + 0.1 * loss14 + 0.1 * loss12 + loss11
-                else:
-                    loss = loss11
+                    if self.epoch < 12:
+                        loss = loss18 + loss14 + loss12 + loss11
+                    elif self.epoch < 24:
+                        loss = 0.1 * loss18 + 0.1 * loss14 + 0.1 * loss12 + loss11
+                    else:
+                        loss = loss11
 
-                # backward + optimize only if in training phase
-                loss.backward()
-                self.optimizer.step()
-                self.optimizer.zero_grad()
+                    # backward + optimize only if in training phase
+                    loss.backward()
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
 
 
-                # statistics
-                loss_meter[s].update(loss11.item(), inputs_d.size(0))
+                    # statistics
+                    loss_meter[s].update(loss11.item(), inputs_d.size(0))
 
-                end_iter_time = time.time()
-                iter_duration = end_iter_time - start_iter_time
-                if self.params['print_time_each_iter']:
-                    print('finish the iteration in %.2f s.\n' % (
-                        iter_duration))
-                    print('Loss within the curt iter: {:.8f}\n'.format(loss_meter[s].avg))
+                    end_iter_time = time.time()
+                    iter_duration = end_iter_time - start_iter_time
+                    if self.params['print_time_each_iter']:
+                        print('finish the iteration in %.2f s.\n' % (
+                            iter_duration))
+                        print('Loss within the curt iter: {:.8f}\n'.format(loss_meter[s].avg))
 
             print('[{}] Loss: {:.8f}'.format(s, loss_meter[s].avg))
             #

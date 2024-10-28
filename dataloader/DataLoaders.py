@@ -11,13 +11,9 @@ __maintainer__ = "Abdelrahman Eldesokey"
 __email__ = "abdo.eldesokey@gmail.com"
 ########################################
 
-import os
-import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
 from dataloader.K2DC_Dataset import KittiDepthDataset
-import random
-import glob
 num_worker = 8
 
 def KittiDataLoader(params):
@@ -26,7 +22,6 @@ def KittiDataLoader(params):
 
     image_datasets = {}
     dataloaders = {}
-    datasizes = {}
 
     data_path = params['dir_ds']
     crop = transforms.CenterCrop((352, 1216))
@@ -41,20 +36,17 @@ def KittiDataLoader(params):
 
     dataloaders['train'] = DataLoader(image_datasets['train'], shuffle=True, batch_size=params['train_batch_sz'],
                                       num_workers=num_worker)
-    datasizes['train'] = {len(image_datasets['train'])}
     ###### Test Set ######
     image_datasets['test'] = KittiDepthDataset(data_path, setname='test', transform=crop, flip=False)
 
     dataloaders['test'] = DataLoader(image_datasets['test'], shuffle=True, batch_size=params['train_batch_sz'],
                                       num_workers=num_worker)
-    datasizes['test'] = {len(image_datasets['test'])}
 
     ###### Validation Set ######
     image_datasets['val'] = KittiDepthDataset(data_path, setname='val', transform=crop, flip=False)
     
-    dataloaders['val'] = DataLoader(image_datasets['val'], shuffle=False, batch_size=params['val_batch_sz'],
+    dataloaders['val'] = DataLoader(image_datasets['val'], shuffle=True, batch_size=params['val_batch_sz'],
                                     num_workers=num_worker)
-    datasizes['val'] = {len(image_datasets['val'])}
 
     return dataloaders
 
