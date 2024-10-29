@@ -81,7 +81,8 @@ class KittiDepthTrainer(Trainer):
         print(time.strftime('%m.%d.%H:%M:%S', time.localtime(time.time())))
 
         # 记录损失值
-        losses = []
+        train_losses = []
+        val_losses = []
 
         for epoch in range(self.epoch, max_epochs + 1):  # range function returns max_epochs-1
             start_epoch_time = time.time()
@@ -95,11 +96,12 @@ class KittiDepthTrainer(Trainer):
 
             # Train the epoch
             # 得到当前轮次的损失值
-            loss_meter = self.train_epoch()
+            loss_meter, loss_val = self.train_epoch()
             self.lr_scheduler.step()  # LR decay
 
             # 保存损失值
-            losses.append(loss_meter)
+            train_losses.append(loss_meter['train'])
+            val_losses.append(loss_val)
 
             # Add the average loss for this epoch to stats
             for s in self.sets: self.stats[s + '_loss'].append(loss_meter[s].avg)
@@ -124,7 +126,7 @@ class KittiDepthTrainer(Trainer):
         print("Training [%s] Finished using %.2f HRs." % (self.exp_name, self.training_time / 3600))
         
         # 保存损失值折线图
-        plot_losses(losses, 'output/losses/losses.png')
+        plot_losses(train_losses, loss, 'output/losses/losses.png')
 
         return self.net
     
@@ -171,45 +173,43 @@ class KittiDepthTrainer(Trainer):
         for s in self.sets: loss_meter[s] = AverageMeter()
 
         for s in self.sets:
-            # Iterate over data.
-            for i in range(7):
-                for data in self.dataloaders[s]:
-                    start_iter_time = time.time()
-                    inputs_d, labels, item_idxs, inputs_gray, C = data
-                    C = C.to(device)
-                    inputs_d = inputs_d.to(device)
-                    labels = labels.to(device)
-                    inputs_gray = inputs_gray.to(device)
+            for data in self.dataloaders[s]:
+                start_iter_time = time.time()
+                inputs_d, labels, item_idxs, inputs_gray, C = data
+                C = C.to(device)
+                inputs_d = inputs_d.to(device)
+                labels = labels.to(device)
+                inputs_gray = inputs_gray.to(device)
 
-                    outputs = self.net(inputs_d, inputs_gray)
-                    # Calculate loss for valid pixel in the ground truth
-                    loss11 = self.objective(outputs[0], labels)
-                    loss12 = self.objective(outputs[1], labels)
-                    loss14 = self.objective(outputs[2], labels)
-                    loss18 = self.objective(outputs[3], labels)
+                outputs = self.net(inputs_d, inputs_gray)
+                # Calculate loss for valid pixel in the ground truth
+                loss11 = self.objective(outputs[0], labels)
+                loss12 = self.objective(outputs[1], labels)
+                loss14 = self.objective(outputs[2], labels)
+                loss18 = self.objective(outputs[3], labels)
 
-                    if self.epoch < 12:
-                        loss = loss18 + loss14 + loss12 + loss11
-                    elif self.epoch < 24:
-                        loss = 0.1 * loss18 + 0.1 * loss14 + 0.1 * loss12 + loss11
-                    else:
-                        loss = loss11
+                if self.epoch < 12:
+                    loss = loss18 + loss14 + loss12 + loss11
+                elif self.epoch < 24:
+                    loss = 0.1 * loss18 + 0.1 * loss14 + 0.1 * loss12 + loss11
+                else:
+                    loss = loss11
 
-                    # backward + optimize only if in training phase
-                    loss.backward()
-                    self.optimizer.step()
-                    self.optimizer.zero_grad()
+                # backward + optimize only if in training phase
+                loss.backward()
+                self.optimizer.step()
+                self.optimizer.zero_grad()
 
 
-                    # statistics
-                    loss_meter[s].update(loss11.item(), inputs_d.size(0))
+                # statistics
+                loss_meter[s].update(loss11.item(), inputs_d.size(0))
 
-                    end_iter_time = time.time()
-                    iter_duration = end_iter_time - start_iter_time
-                    if self.params['print_time_each_iter']:
-                        print('finish the iteration in %.2f s.\n' % (
-                            iter_duration))
-                        print('Loss within the curt iter: {:.8f}\n'.format(loss_meter[s].avg))
+                end_iter_time = time.time()
+                iter_duration = end_iter_time - start_iter_time
+                if self.params['print_time_each_iter']:
+                    print('finish the iteration in %.2f s.\n' % (
+                        iter_duration))
+                    print('Loss within the curt iter: {:.8f}\n'.format(loss_meter[s].avg))
 
             print('[{}] Loss: {:.8f}'.format(s, loss_meter[s].avg))
             #
@@ -217,7 +217,7 @@ class KittiDepthTrainer(Trainer):
             print('[{}] Loss: {:.8f}'.format("val", loss_val.avg))
             torch.cuda.empty_cache()
 
-        return loss_meter
+        return loss_meter, loss_val
 
     ####### Evaluation Function #######
 
@@ -330,8 +330,7 @@ class KittiDepthTrainer(Trainer):
                     if s in ['test']:
                         outputs = outputs.data
 
-                        outputs *= 256
-
+                        outputs *= 16 * 256 
                         saveTensorToImage(outputs, item_idxs, os.path.join(self.workspace_dir,
                                                                            s + '_output_' + 'epoch_' + str(
                                                                                self.epoch)))

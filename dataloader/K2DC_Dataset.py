@@ -69,9 +69,9 @@ class KittiDepthDataset(Dataset):
         C = (depth > 0).astype(float)
 
         # Normalize the depth
-        # depth = depth / 256  # [0,1]
-        # gt = gt / 256
-        # gray = gray /256
+        depth = depth / 255  # [0,1]
+        gt = gt / 16
+        gray = gray /255
 
         # Expand dims into Pytorch format
         depth = np.expand_dims(depth, 0)

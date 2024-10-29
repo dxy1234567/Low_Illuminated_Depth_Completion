@@ -1,18 +1,19 @@
 from matplotlib import pyplot as plt
 
-def plot_losses(losses, path_output):
-    plt.plot(losses, label='Training Loss')
+def plot_losses(train_losses, val_losses, path_output):
+    N = len(train_losses)
+    # 绘制折线图
+    epochs = list(range(1, N + 1))
 
-    # 设置标题和标签
-    plt.title('Training Loss Over Epochs')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss Value')
-
-    # 显示图例
+    plt.figure(figsize=(10, 5))
+    plt.plot(epochs, train_losses, label='Train Loss', marker='o')
+    plt.plot(epochs, val_losses, label='Validation Loss', marker='o')
+    plt.title('Train and Validation Loss over Epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.xticks(epochs)
     plt.legend()
+    plt.grid()
 
-    # 显示网格
-    plt.grid(True)
-
-    # 保存图形到指定路径
+    # 保存图像
     plt.savefig(path_output)
