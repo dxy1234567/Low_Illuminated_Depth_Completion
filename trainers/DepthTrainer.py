@@ -330,7 +330,8 @@ class KittiDepthTrainer(Trainer):
                     if s in ['test']:
                         outputs = outputs.data
 
-                        outputs *= 16 * 256 
+                        outputs *= 16
+                        outputs = outputs.type(torch.uint8)
                         saveTensorToImage(outputs, item_idxs, os.path.join(self.workspace_dir,
                                                                            s + '_output_' + 'epoch_' + str(
                                                                                self.epoch)))

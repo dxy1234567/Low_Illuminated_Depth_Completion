@@ -1,2 +1,3 @@
 test_output_epoch_1/*
 checkpoints/*
+__pycache__
