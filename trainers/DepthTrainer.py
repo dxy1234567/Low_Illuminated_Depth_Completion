@@ -126,7 +126,7 @@ class KittiDepthTrainer(Trainer):
         print("Training [%s] Finished using %.2f HRs." % (self.exp_name, self.training_time / 3600))
         
         # 保存损失值折线图
-        plot_losses(train_losses, loss, 'output/losses/losses.png')
+        plot_losses(train_losses, val_losses, 'output/losses/losses.png')
 
         return self.net
     
@@ -330,8 +330,7 @@ class KittiDepthTrainer(Trainer):
                     if s in ['test']:
                         outputs = outputs.data
 
-                        outputs *= 16
-                        outputs = outputs.type(torch.uint8)
+                        outputs *= 255
                         saveTensorToImage(outputs, item_idxs, os.path.join(self.workspace_dir,
                                                                            s + '_output_' + 'epoch_' + str(
                                                                                self.epoch)))

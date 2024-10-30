@@ -5,6 +5,7 @@ import shutil
 def extract_random_frames_with_types(sequences_dir, output_dir, test_ratio=0.1, val_ratio=0.05):
     """
     从每个序列中随机抽取num_frames个帧，并确保depth, depth_gt, gray三种数据对应。
+
     Params: 
         base_dir: 存放序列的根目录，每个序列有depth, depth_gt, gray三个子文件夹
         output_dir: 测试集输出目录
@@ -14,7 +15,6 @@ def extract_random_frames_with_types(sequences_dir, output_dir, test_ratio=0.1, 
 
     sequences = {"00", "05", "07"}
     types_data = ['depth', 'depth_gt', 'gray']
-    types_dataset = ['train', 'test', 'val']
 
     for sequence in sequences:
         # 获取三个类型的文件夹路径，在每个序列中
@@ -32,7 +32,6 @@ def extract_random_frames_with_types(sequences_dir, output_dir, test_ratio=0.1, 
 
         test_size = int(frames_size * test_ratio)
         val_size = int(frames_size * val_ratio)
-        train_size = frames_size - test_size - val_size
 
         # 随机选择测试集
         test_frames = random.sample(frame_files, test_size)
