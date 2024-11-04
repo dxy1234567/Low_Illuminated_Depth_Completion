@@ -22,12 +22,13 @@ from torch.utils.data import  Dataset
 
 
 class KittiDepthDataset(Dataset):
-    def __init__(self, data_path, setname='train', transform=None, flip = False):
+    def __init__(self, data_path, setname='train', norm_size=255.0, transform=None, flip = False):
         self.data_path = data_path  # KITTI_to_DC/dataset/
         self.setname = setname
         self.transform = transform
         self.flip = flip
-        
+        self.norm_size = norm_size
+
         self.types = ['depth', 'depth_gt', 'gray']
 
         # Lists of depth, gt, and gray.
@@ -69,9 +70,9 @@ class KittiDepthDataset(Dataset):
         C = (depth > 0).astype(float)
 
         # Normalize the depth
-        depth = depth / 255  # [0,1]
-        gt = gt / 255
-        gray = gray /255
+        depth = depth / self.norm_size  # [0,1]
+        gt = gt / self.norm_size
+        gray = gray /self.norm_size
 
         # Expand dims into Pytorch format
         depth = np.expand_dims(depth, 0)

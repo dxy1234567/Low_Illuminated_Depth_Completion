@@ -13,7 +13,7 @@
     "lr": 0.001,
     "weight_decay": 0.0002,
     "lr_decay": 0.5,
-    "lr_decay_step": 5,
+    "lr_decay_step": 8,
     "num_epochs": 27,
     "save_chkpt_each": 1,
     "save_out_imgs": false,
@@ -29,5 +29,5 @@
     "dataset": "KittiDepthDataset",
     "data_loader": "KittiDataLoader",
     "exp_name": "exp_msg_chn",
-    "dir_ds": "/data/KITTI_to_DC/dataset/"
+    "dir_ds": "/data/gml_to_DC/dataset/"
 }

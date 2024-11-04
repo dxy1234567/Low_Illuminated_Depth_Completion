@@ -2,7 +2,7 @@ import os
 import random
 import shutil
 
-def extract_random_frames_with_types(sequences_dir, output_dir, test_ratio=0.1, val_ratio=0.05):
+def extract_random_frames_with_types(sequences, sequences_dir, output_dir, test_ratio=0.1, val_ratio=0.05):
     """
     从每个序列中随机抽取num_frames个帧，并确保depth, depth_gt, gray三种数据对应。
 
@@ -13,7 +13,6 @@ def extract_random_frames_with_types(sequences_dir, output_dir, test_ratio=0.1, 
     # 确保输出目录存在
     os.makedirs(output_dir, exist_ok=True)
 
-    sequences = {"00", "05", "07"}
     types_data = ['depth', 'depth_gt', 'gray']
 
     for sequence in sequences:
@@ -63,4 +62,9 @@ def extract_random_frames_with_types(sequences_dir, output_dir, test_ratio=0.1, 
 # 使用示例
 sequence_dir = '/data/KITTI_to_DC/'  # 原始序列的根目录
 output_dir = '/data/KITTI_to_DC/dataset/'      # 测试集输出目录
-extract_random_frames_with_types(sequence_dir, output_dir)
+
+
+# sequences = {"01"}
+sequences = {"00", "05", "07"}
+
+extract_random_frames_with_types(sequences, sequence_dir, output_dir)
