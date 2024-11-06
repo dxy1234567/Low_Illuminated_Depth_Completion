@@ -1,7 +1,7 @@
 {   "use_gpu": true,
     "gpu_id": 0,
     "invert_depth": false,
-    "data_normalize_factor": 16.0,
+    "data_normalize_factor": 1.0,
     "dataset_dir": "/data",
     "rgb_dir": "/data/raw",
     "train_batch_sz": 16,
