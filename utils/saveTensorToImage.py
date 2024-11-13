@@ -26,7 +26,7 @@ def saveTensorToImage(t, idxs, save_to_path):
 
     for i in range(t.size(0)):
         im = t[i, :, :, :].detach().data.cpu().numpy()
-        im = np.transpose(im, (1, 2, 0)).astype(np.uint8)
+        im = np.transpose(im, (1, 2, 0)).astype(np.uint16)
         '''imout = np.zeros((374,1238,1))
         imout[374-352:,:,:] = im[:,5:-5,:]'''
         imout = im

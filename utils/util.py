@@ -1,4 +1,27 @@
 from matplotlib import pyplot as plt
+from datetime import datetime
+
+def write_log(train_losses, val_losses, path_output):
+    N = len(train_losses)
+    assert N == len(val_losses), "Train and validation loss lists must be of the same length."
+    
+    # 打开文件，追加模式写入
+    with open(path_output, 'a') as log_file:
+        # 写入标题和当前时间
+        log_file.write("Training Log\n")
+        log_file.write(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        log_file.write("="*40 + "\n")
+        
+        # 写入表头
+        log_file.write(f"{'Epoch':<10}{'Train Loss':<15}{'Val Loss':<15}\n")
+        log_file.write("-"*40 + "\n")
+
+        # 写入每一轮的损失数据
+        for i in range(N):
+            log_file.write(f"{i:<10}{train_losses[i]:<15.6f}{val_losses[i]:<15.6f}\n")
+        
+        # 结束分割线
+        log_file.write("="*40 + "\n\n")
 
 def plot_losses(train_losses, val_losses, path_output):
     N = len(train_losses)

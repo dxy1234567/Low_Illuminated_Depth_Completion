@@ -47,7 +47,7 @@ torch.cuda.manual_seed(1)
 # Parse Arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-mode', action='store', dest='mode', default='train', help='"eval" or "train" mode')
-parser.add_argument('-exp', action='store', dest='exp', default='exp_msg_chn',
+parser.add_argument('-exp', action='store', dest='exp', default='gml_udgd',
                     help='Experiment name as in workspace directory')
 parser.add_argument('-chkpt', action='store', dest='chkpt', default=None,  nargs='?',   # None or number
 #parser.add_argument('-chkpt', action='store', dest='chkpt', default="/PATH/TO/YOUR/CHECKPOINT_FILE.pth.tar",

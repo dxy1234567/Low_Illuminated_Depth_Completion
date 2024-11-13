@@ -5,3 +5,6 @@ __pycache__
 workspace/exp_msg_chn/checkpoints/test.txt
 workspace/gml/test_output_epoch_1
 workspace/gml/checkpoints
+test_output_epoch_1
+checkpoints
+output

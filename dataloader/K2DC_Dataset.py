@@ -47,15 +47,13 @@ class KittiDepthDataset(Dataset):
             return None
 
         # Read images and convert them to 4D floats
-        depth = Image.open(str(self.depth[item])).convert('L')
-        gt = Image.open(str(self.gt[item])).convert('L')
-        gray = Image.open(str(self.gray[item])).convert('L')
+        # depth = Image.open(str(self.depth[item])).convert('L')
+        # gt = Image.open(str(self.gt[item])).convert('L')
+        # gray = Image.open(str(self.gray[item])).convert('L')
 
-        # Apply transformations if given
-        if self.transform is not None:
-            depth = self.transform(depth)
-            gt = self.transform(gt)
-            gray = self.transform(gray)
+        depth = cv2.imread(str(self.depth[item]), cv2.IMREAD_UNCHANGED)
+        gt = cv2.imread(str(self.gt[item]), cv2.IMREAD_UNCHANGED)
+        gray = cv2.imread(str(self.gray[item]), cv2.IMREAD_UNCHANGED)
 
         # 数据增强，数据翻转
         if self.flip and random.randint(0, 1) and self.setname == 'train':
@@ -66,6 +64,7 @@ class KittiDepthDataset(Dataset):
         # Convert to numpy
         depth = np.array(depth, dtype=np.float16)
         gt = np.array(gt, dtype=np.float16)
+        cv2.imwrite('test.png', gt)
         gray = np.array(gray, dtype=np.float16)
         C = (depth > 0).astype(float)
 
@@ -84,6 +83,11 @@ class KittiDepthDataset(Dataset):
         gt = torch.tensor(gt, dtype=torch.float)
         gray = torch.tensor(gray, dtype=torch.float)
         C = torch.tensor(C, dtype=torch.float)
-    
+
+        if self.transform is not None:
+            depth = self.transform(depth)
+            gt = self.transform(gt)
+            gray = self.transform(gray)
+
 
         return depth, gt, item, gray, C

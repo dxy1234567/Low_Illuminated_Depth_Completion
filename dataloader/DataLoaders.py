@@ -25,8 +25,8 @@ def KittiDataLoader(params):
 
     norm_size = params['data_normalize_factor']
     data_path = params['dir_ds']
-    # crop = transforms.CenterCrop((480, 832))
-    crop = transforms.CenterCrop((352, 1216))
+    crop = transforms.CenterCrop((480, 832))
+    # crop = transforms.CenterCrop((352, 1216))
 
 
     ###### Training Set ######

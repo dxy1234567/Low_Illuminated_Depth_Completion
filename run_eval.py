@@ -48,10 +48,10 @@ if __name__ == '__main__':
     # Parse Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-mode', action='store', dest='mode', default='eval', help='"eval" or "train" mode')
-    parser.add_argument('-exp', action='store', dest='exp', default='exp_msg_chn',
+    parser.add_argument('-exp', action='store', dest='exp', default='gml_udgd',
                         help='Experiment name as in workspace directory')
     #parser.add_argument('-chkpt', action='store', dest='chkpt', default=50,  nargs='?',   # None or number
-    parser.add_argument('-chkpt', action='store', dest='chkpt', default="workspace/exp_msg_chn/checkpoints/DataParallel_ep0027.pth.tar",
+    parser.add_argument('-chkpt', action='store', dest='chkpt', default="workspace/gml_udgd/checkpoints/DataParallel_ep0047.pth.tar",
                         help='Checkpoint number to load')
 
     parser.add_argument('-set', action='store', dest='set', default='test', type=str, nargs='?',

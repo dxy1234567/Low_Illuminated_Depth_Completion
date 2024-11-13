@@ -1,19 +1,7 @@
-import torch
-from workspace.exp_msg_chn.network_exp_msg_chn import network
-import sys
-sys.path.append('./workspace/exp_msg_chn')
+import cv2
 
-model = network()
-model = torch.nn.DataParallel(model)
+path_img = '/data/data_depth_annotated/train/2011_09_26_drive_0001_sync/proj_depth/groundtruth/image_02/0000000005.png'
 
-params = torch.load('workspace/exp_msg_chn/checkpoints/DataParallel_ep0020.pth.tar', map_location=torch.device('cpu'))
-for key, value in params.items():
-    print(f"{key}: {value.shape}")
+img = cv2.imread(path_img, cv2.IMREAD_UNCHANGED)
 
-
-
-# model.load_state_dict(torch.load('/root/ChenJiasheng/Low_Illuminated_Depth_Completion/workspace/exp_msg_chn/final_model.pth', map_location=torch.device('cpu')))
-
-# # 查看参数
-# for name, param in model.named_parameters():
-#     print(f"{name}: {param.shape}")
+print('End')

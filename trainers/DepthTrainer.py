@@ -22,7 +22,7 @@ from utils.ErrorMetrics import *
 import time
 from modules.losses import *
 import cv2
-from utils.util import plot_losses
+from utils.util import *
 err_metrics = ['MAE()', 'RMSE()','iMAE()', 'iRMSE()']
 
 
@@ -127,6 +127,7 @@ class KittiDepthTrainer(Trainer):
         
         # 保存损失值折线图
         plot_losses(train_losses, val_losses, 'output/losses/losses.png')
+        write_log(train_losses, val_losses, 'output/log/log.txt')
 
         return self.net
     
@@ -331,7 +332,6 @@ class KittiDepthTrainer(Trainer):
                         outputs = outputs.data
 
                         outputs *= 256
-                        # outputs *= self.params['data_normalize_factor']
                         saveTensorToImage(outputs, item_idxs, os.path.join(self.workspace_dir,
                                                                            s + '_output_' + 'epoch_' + str(
                                                                                self.epoch)))

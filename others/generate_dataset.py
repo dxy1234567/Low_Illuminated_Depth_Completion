@@ -4,11 +4,11 @@ import shutil
 
 def extract_random_frames_with_types(sequences, sequences_dir, output_dir, test_ratio=0.1, val_ratio=0.05):
     """
-    从每个序列中随机抽取num_frames个帧，并确保depth, depth_gt, gray三种数据对应。
+        从每个序列中随机抽取num_frames个帧，并确保depth, depth_gt, gray三种数据对应。
 
-    Params: 
-        base_dir: 存放序列的根目录，每个序列有depth, depth_gt, gray三个子文件夹
-        output_dir: 测试集输出目录
+        Params: 
+            base_dir: 存放序列的根目录，每个序列有depth, depth_gt, gray三个子文件夹
+            output_dir: 测试集输出目录
     """
     # 确保输出目录存在
     os.makedirs(output_dir, exist_ok=True)
@@ -60,11 +60,11 @@ def extract_random_frames_with_types(sequences, sequences_dir, output_dir, test_
         print(f"从序列中随机抽取了数据保存到 {output_dir}")
 
 # 使用示例
-sequence_dir = '/data/KITTI_to_DC/'  # 原始序列的根目录
-output_dir = '/data/KITTI_to_DC/dataset/'      # 测试集输出目录
+sequence_dir = '/data/gml_to_DC/'  # 原始序列的根目录
+output_dir = '/data/gml_to_DC/dataset_04/'      # 测试集输出目录
 
 
 # sequences = {"01"}
-sequences = {"00", "05", "07"}
+sequences = {"04"}
 
 extract_random_frames_with_types(sequences, sequence_dir, output_dir)
